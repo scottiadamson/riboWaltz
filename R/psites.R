@@ -475,18 +475,18 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
       cat("3. adding nucleotide sequence(s)\n")
       if("psite" %in% site){
         dt[, p_site_codon := as.character(Biostrings::subseq(sequences[as.character(dt$transcript)],
-                                                             start = max(c(dt$psite, 0)),
-                                                             end = max(c(dt$psite+2, 0)))]
+                                                             start = dt$psite, 0,
+                                                             end = dt$psite+2))]
       }
       if("asite" %in% site){
         dt[, a_site_codon := as.character(Biostrings::subseq(sequences[as.character(dt$transcript)],
-                                                             start = max(c(dt$psite + 3, 0)),
-                                                             end = max(c(dt$psite + 5), 0)))]
+                                                             start = dt$psite + 3,
+                                                             end = dt$psite + 5))]
       }
       if("esite" %in% site){
         dt[, e_site_codon := as.character(Biostrings::subseq(sequences[as.character(dt$transcript)],
-                                                             start = max(c(dt$psite - 3, 0)),
-                                                             end = max(c(dt$psite - 1))]
+                                                             start = dt$psite - 3,
+                                                             end = dt$psite - 1))]
       }
     }
     
