@@ -459,8 +459,14 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
     cat("1. adding p-site position\n")
     dt[suboff,  on = 'length', psite := i.corrected_offset_from_3]
     dt[, psite := end3 - psite]
-    dt <- dt[dt$psite >= min_coor,]
+   	cat(paste(str(length(dt$transcript)), "\n"))
+	print(head(dt))
+	dt <- dt[dt$psite >= min_coor,]
+	cat(paste(str(length(dt$transcript)), "\n"))
+	print(head(dt))
     dt <- dt[dt$psite <= max_coor + length(sequences[as.character(dt$transcript)]),]
+	cat(paste(str(length(dt$transcript)), "\n"))
+	print(head(dt))
     setcolorder(dt,c("transcript", "end5", "psite", "end3", "length", "cds_start", "cds_stop"))
     dt[, psite_from_start := psite - cds_start
        ][cds_stop == 0, psite_from_start := 0]
@@ -475,7 +481,7 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
       cat("3. adding nucleotide sequence(s)\n")
       if("psite" %in% site){
         dt[, p_site_codon := as.character(Biostrings::subseq(sequences[as.character(dt$transcript)],
-                                                             start = dt$psite, 0,
+                                                             start = dt$psite,
                                                              end = dt$psite+2))]
       }
       if("asite" %in% site){
