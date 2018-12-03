@@ -321,6 +321,9 @@ psite <- function(data, flanking = 6, start = TRUE, extremity = "auto",
 #' @param granges Logical value whether to return a GRangesList object. Default
 #'   is FALSE i.e. a list of data tables (the required input for downstream
 #'   analyses and graphical outputs provided by riboWaltz) is returned instead.
+#' @param min_coor Integer value indicating the minimum location of a psite to consider
+#' @param max_coor Integer value indicating the maximum location of a psite from the end
+#'  of the transcript to consider. -4 means 4 from the 3' end of the transcript
 #' @details \strong{riboWaltz} only works for read alignments based on
 #'   transcript coordinates. This choice is due to the main purpose of RiboSeq
 #'   assays to study translational events through the isolation and sequencing
@@ -350,7 +353,7 @@ psite <- function(data, flanking = 6, start = TRUE, extremity = "auto",
 psite_info <- function(data, offset, site = NULL, fastapath = NULL, 
                        fasta_genome = TRUE, bsgenome = NULL, gtfpath = NULL,
                        txdb = NULL, dataSource = NA, organism = NA,
-                       granges = FALSE) {
+                       granges = FALSE, min_coor = 4, max_coor = -4) {
   
   if(!(all(site %in% c("psite", "asite", "esite"))) & length(site) != 0){
     cat("\n")
@@ -452,6 +455,8 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
   for (n in names) {
     cat(sprintf("processing %s\n", n))
     dt <- data[[n]]
+    dt <- dt[dt$psite >= min_coor,]
+    dt <- dt[dt$psite <= max_coor + length(sequences[as.character(dt$transcript)]),]
     suboff <- offset[sample == n, .(length,corrected_offset_from_3)]
     cat("1. adding p-site position\n")
     dt[suboff,  on = 'length', psite := i.corrected_offset_from_3]
