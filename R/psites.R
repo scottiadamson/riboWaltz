@@ -455,12 +455,12 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
   for (n in names) {
     cat(sprintf("processing %s\n", n))
     dt <- data[[n]]
-    dt <- dt[dt$psite >= min_coor,]
-    dt <- dt[dt$psite <= max_coor + length(sequences[as.character(dt$transcript)]),]
     suboff <- offset[sample == n, .(length,corrected_offset_from_3)]
     cat("1. adding p-site position\n")
     dt[suboff,  on = 'length', psite := i.corrected_offset_from_3]
     dt[, psite := end3 - psite]
+    dt <- dt[dt$psite >= min_coor,]
+    dt <- dt[dt$psite <= max_coor + length(sequences[as.character(dt$transcript)]),]
     setcolorder(dt,c("transcript", "end5", "psite", "end3", "length", "cds_start", "cds_stop"))
     dt[, psite_from_start := psite - cds_start
        ][cds_stop == 0, psite_from_start := 0]
