@@ -414,8 +414,8 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
           exon <- as.data.table(exon[unique(names(exon))])
           sub_exon_plus <- exon[as.character(seqnames) %in% names(temp_sequences) & strand == "+"]
           sub_exon_minus <- exon[as.character(seqnames) %in% names(temp_sequences) & strand == "-"
-                                 ][, new_end := width(temp_sequences[as.character(seqnames)]) - start + 1
-                                   ][, new_start := width(temp_sequences[as.character(seqnames)]) - end + 1]
+                                 ][, new_end := BiocGenerics::width(temp_sequences[as.character(seqnames)]) - start + 1
+                                   ][, new_start := BiocGenerics::width(temp_sequences[as.character(seqnames)]) - end + 1]
           
           seq_dt_plus <- sub_exon_plus[, nt_seq := "emp"
                                        ][, nt_seq := as.character(Biostrings::subseq(temp_sequences[as.character(seqnames)],
@@ -423,7 +423,7 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
                                                                                      end = end))
                                          ][, list(seq = paste(nt_seq, collapse = "")), by = group_name]
           
-          revcompl_temp_sequences <- reverseComplement(temp_sequences)
+          revcompl_temp_sequences <- Biostrings::reverseComplement(temp_sequences)
           seq_dt_minus <- sub_exon_minus[, nt_seq := "emp"
                                          ][, nt_seq := as.character(Biostrings::subseq(revcompl_temp_sequences[as.character(seqnames)],
                                                                                        start = new_start,
@@ -470,18 +470,18 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
       cat("3. adding nucleotide sequence(s)\n")
       if("psite" %in% site){
         dt[, p_site_codon := as.character(Biostrings::subseq(sequences[as.character(dt$transcript)],
-                                                             start = dt$psite,
-                                                             end = dt$psite + 2))]
+                                                             start = max(c(dt$psite, 0)),
+                                                             end = max(c(dt$psite+2, 0)))]
       }
       if("asite" %in% site){
         dt[, a_site_codon := as.character(Biostrings::subseq(sequences[as.character(dt$transcript)],
-                                                             start = dt$psite + 3,
-                                                             end = dt$psite + 5))]
+                                                             start = max(c(dt$psite + 3, 0)),
+                                                             end = max(c(dt$psite + 5), 0)))]
       }
       if("esite" %in% site){
         dt[, e_site_codon := as.character(Biostrings::subseq(sequences[as.character(dt$transcript)],
-                                                             start = dt$psite - 3,
-                                                             end = dt$psite - 1))]
+                                                             start = max(c(dt$psite - 3, 0)),
+                                                             end = max(c(dt$psite - 1))]
       }
     }
     
