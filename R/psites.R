@@ -459,14 +459,8 @@ psite_info <- function(data, offset, site = NULL, fastapath = NULL,
     cat("1. adding p-site position\n")
     dt[suboff,  on = 'length', psite := i.corrected_offset_from_3]
     dt[, psite := end3 - psite]
-   	cat(paste(str(length(dt$transcript)), "\n"))
-	print(head(dt))
 	dt <- dt[dt$psite >= min_coor,]
-	cat(paste(str(length(dt$transcript)), "\n"))
-	print(head(dt))
-    dt <- dt[dt$psite <= max_coor + length(sequences[as.character(dt$transcript)]),]
-	cat(paste(str(length(dt$transcript)), "\n"))
-	print(head(dt))
+    dt <- dt[dt$psite <= max_coor + Biostrings::width(sequences[as.character(dt$transcript)]),]
     setcolorder(dt,c("transcript", "end5", "psite", "end3", "length", "cds_start", "cds_stop"))
     dt[, psite_from_start := psite - cds_start
        ][cds_stop == 0, psite_from_start := 0]
